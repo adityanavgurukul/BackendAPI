@@ -3,7 +3,7 @@ const Todo = require('../models/Todo');
 const verifyToken = require('../middleware/auth');
 
 // Create todo
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const todo = new Todo({
             title: req.body.title,
@@ -18,7 +18,7 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 // Get all todos for a user
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const todos = await Todo.find({ userId: req.user._id });
         res.json(todos);
@@ -28,7 +28,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // Get single todo
-router.get('/:id', verifyToken, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const todo = await Todo.findOne({ _id: req.params.id, userId: req.user._id });
         if (!todo) return res.status(404).json({ message: 'Todo not found' });
@@ -39,7 +39,7 @@ router.get('/:id', verifyToken, async (req, res) => {
 });
 
 // Update todo
-router.put('/:id', verifyToken, async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const todo = await Todo.findOne({ _id: req.params.id, userId: req.user._id });
         if (!todo) return res.status(404).json({ message: 'Todo not found' });
@@ -60,7 +60,7 @@ router.put('/:id', verifyToken, async (req, res) => {
 });
 
 // Delete todo
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const todo = await Todo.findOne({ _id: req.params.id, userId: req.user._id });
         if (!todo) return res.status(404).json({ message: 'Todo not found' });
