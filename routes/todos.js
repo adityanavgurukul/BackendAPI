@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
 // Get all todos for a user
 router.get('/', async (req, res) => {
     try {
-        const todos = await Todo.find({ userId: req.user._id });
+        const todos = await Todo.find({});
         res.json(todos);
     } catch (error) {
         res.status(500).json({ message: error.message });
