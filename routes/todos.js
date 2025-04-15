@@ -8,7 +8,6 @@ router.post('/', async (req, res) => {
         const todo = new Todo({
             title: req.body.title,
             completed: req.body.completed,
-            userId: req.user._id
         });
         const savedTodo = await todo.save();
         res.status(201).json(savedTodo);
@@ -30,7 +29,7 @@ router.get('/', async (req, res) => {
 // Get single todo
 router.get('/:id', async (req, res) => {
     try {
-        const todo = await Todo.findOne({ _id: req.params.id, userId: req.user._id });
+        const todo = await Todo.findOne({ _id: req.params.id});
         if (!todo) return res.status(404).json({ message: 'Todo not found' });
         res.json(todo);
     } catch (error) {
@@ -41,7 +40,7 @@ router.get('/:id', async (req, res) => {
 // Update todo
 router.put('/:id', async (req, res) => {
     try {
-        const todo = await Todo.findOne({ _id: req.params.id, userId: req.user._id });
+        const todo = await Todo.findOne({ _id: req.params.id});
         if (!todo) return res.status(404).json({ message: 'Todo not found' });
 
         const updatedTodo = await Todo.findByIdAndUpdate(
@@ -62,7 +61,7 @@ router.put('/:id', async (req, res) => {
 // Delete todo
 router.delete('/:id', async (req, res) => {
     try {
-        const todo = await Todo.findOne({ _id: req.params.id, userId: req.user._id });
+        const todo = await Todo.findOne({ _id: req.params.id});
         if (!todo) return res.status(404).json({ message: 'Todo not found' });
 
         await Todo.findByIdAndDelete(req.params.id);
