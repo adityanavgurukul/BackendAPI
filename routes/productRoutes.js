@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const verifyToken = require('../middleware/auth');
 
 // GET /api/products - Get all products
 router.get('/', async (req, res) => {
@@ -23,8 +24,8 @@ router.get('/', async (req, res) => {
 // GET /api/products/:id - Get a single product by ID
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
-
+        const product = await Product.findOne({ _id: parseInt(req.params.id) });
+        console.log(req.params.id);
         if (!product) {
             return res.status(404).json({
                 success: false,
@@ -37,6 +38,13 @@ router.get('/:id', async (req, res) => {
             data: product
         });
     } catch (error) {
+        console.log(error);
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid product ID format'
+            });
+        }
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -48,13 +56,31 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const { title, price, description, category, image } = req.body;
-        const product = await Product.create({ title, price, description, category, image});
+        //Find the last item in products
+        const lastProduct = await Product.findOne().sort({ _id: -1 });
+        const product = await Product.create({
+            _id: lastProduct ? lastProduct._id + 1 : 1, // Increment the last product ID
+            title, 
+            price, 
+            description, 
+            category, 
+            image,
+            rating: { rate: 0, count: 0 }
+        });
 
         res.status(201).json({
             success: true,
             data: product
         });
     } catch (error) {
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                error: messages
+            });
+        }
+        console.log(error);
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -65,8 +91,22 @@ router.post('/', async (req, res) => {
 // PUT /api/products/:id - Update a product by ID
 router.put('/:id', async (req, res) => {
     try {
-        const { name, price, favourite } = req.body;
-        const product = await Product.findByIdAndUpdate(req.params.id, { name, price, favourite }, { new: true, runValidators: true });
+        const { title, price, description, category, image, favourite } = req.body;
+        const product = await Product.findOneAndUpdate(
+            {_id: parseInt(req.params.id)}, 
+            { 
+                title, 
+                price, 
+                description, 
+                category, 
+                image, 
+                favourite 
+            }, 
+            { 
+                new: true, 
+                runValidators: true 
+            }
+        );
 
         if (!product) {
             return res.status(404).json({
@@ -80,6 +120,19 @@ router.put('/:id', async (req, res) => {
             data: product
         });
     } catch (error) {
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                error: messages
+            });
+        }
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid product ID format'
+            });
+        }
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -90,8 +143,7 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/products/:id - Delete a product by ID
 router.delete('/:id', async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
-
+        const product = await Product.findOneAndDelete({ _id: parseInt(req.params.id) });
         if (!product) {
             return res.status(404).json({
                 success: false,
@@ -101,9 +153,14 @@ router.delete('/:id', async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: {}
         });
     } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid product ID format'
+            });
+        }
         res.status(500).json({
             success: false,
             error: 'Server Error'
