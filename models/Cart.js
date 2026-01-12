@@ -6,10 +6,7 @@ const cartSchema = new mongoose.Schema({
         required: [true, 'Please add a product name'],
         trim: true
     },
-    productID: {
-        type: mongoose.Schema.Types.Mixed,
-        required: [true, 'Please add a productID']
-    },
+    id: { type: mongoose.Schema.Types.Mixed, required: false },
     quantity: {
         type: Number,
         required: [true, 'Please add a quantity'],
