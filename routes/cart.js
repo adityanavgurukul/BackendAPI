@@ -4,8 +4,8 @@ const Cart = require('../models/Cart');
 // Create cart item
 router.post('/', async (req, res) => {
     try {
-        const { name, productID, quantity, price } = req.body;
-        const item = new Cart({ name, productID, quantity, price });
+        const { title, productID, quantity, price } = req.body;
+        const item = new Cart({ title, productID, quantity, price });
         const saved = await item.save();
         res.status(201).json(saved);
     } catch (error) {
