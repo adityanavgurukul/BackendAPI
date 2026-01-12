@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-    _id: { type: mongoose.Schema.Types.Mixed, required: false },
+    id: { type: mongoose.Schema.Types.Mixed, required: false },
     title: {
         type: String,
         required: [true, 'Please add a title'],
@@ -38,9 +38,18 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-}, { 
-    _id: false, // Disable automatic _id generation
-    timestamps: true
+}, {
+    _id: false, // Disable automatic _id generation (we use `id` instead)
+    timestamps: true,
+    toJSON: {
+        virtuals: false,
+        transform(doc, ret) {
+            // ensure `id` is present and remove internal fields if any
+            if (ret.id === undefined && ret._id !== undefined) ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+        }
+    }
 });
 
 module.exports = mongoose.model('Product', productSchema);

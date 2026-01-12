@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 // GET /api/products/:id - Get a single product by ID
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findOne({ _id: parseInt(req.params.id) });
+        const product = await Product.findOne({ id: parseInt(req.params.id) });
         console.log(req.params.id);
         if (!product) {
             return res.status(404).json({
@@ -57,9 +57,9 @@ router.post('/', async (req, res) => {
     try {
         const { title, price, description, category, image } = req.body;
         //Find the last item in products
-        const lastProduct = await Product.findOne().sort({ _id: -1 });
+        const lastProduct = await Product.findOne().sort({ id: -1 });
         const product = await Product.create({
-            _id: lastProduct ? lastProduct._id + 1 : 1, // Increment the last product ID
+            id: lastProduct ? lastProduct.id + 1 : 1, // Increment the last product ID
             title, 
             price, 
             description, 
@@ -93,7 +93,7 @@ router.put('/:id', async (req, res) => {
     try {
         const { title, price, description, category, image, favourite } = req.body;
         const product = await Product.findOneAndUpdate(
-            {_id: parseInt(req.params.id)}, 
+            {id: parseInt(req.params.id)}, 
             { 
                 title, 
                 price, 
@@ -143,7 +143,7 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/products/:id - Delete a product by ID
 router.delete('/:id', async (req, res) => {
     try {
-        const product = await Product.findOneAndDelete({ _id: parseInt(req.params.id) });
+        const product = await Product.findOneAndDelete({ id: parseInt(req.params.id) });
         if (!product) {
             return res.status(404).json({
                 success: false,

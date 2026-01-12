@@ -47,7 +47,7 @@ router.put('/:id', async (req, res) => {
         const updated = await Cart.findByIdAndUpdate(
             req.params.id,
             {
-                name: req.body.name ?? item.name,
+                title: req.body.title ?? item.title,
                 productID: req.body.productID ?? item.productID,
                 quantity: req.body.quantity ?? item.quantity,
                 price: req.body.price ?? item.price
